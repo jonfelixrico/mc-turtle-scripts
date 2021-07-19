@@ -182,3 +182,27 @@ function moveToY(destY)
 
     return true
 end
+
+function doXMovement()
+    if posX == blX then
+        moveToX(trX)
+    else
+        moveToX(blX)
+    end
+end
+
+for y = blY, trY, 1 do
+    moveToY(y)
+
+    if posZ == blZ then
+        for z = blZ, trZ, 1 do
+            moveToZ(z)
+            doXMovement()
+        end
+    else
+        for z = trZ, blZ, -1 do
+            moveToZ(z)
+            doXMovement()
+        end
+    end
+end
