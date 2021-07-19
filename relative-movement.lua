@@ -73,6 +73,8 @@ function turn(dir)
             turtle.turnLeft()
         end
     end
+
+    bearing = dir
 end
 
 -- if movement was successful, returns true; false if otherwise
@@ -95,6 +97,8 @@ end
 
 function moveToX(destX)
     local moves = destX - posX
+    print(posX)
+    print(destX)
     if moves == 0 then return end
 
     local posIncrement = 1
@@ -191,18 +195,38 @@ function doXMovement()
     end
 end
 
-for y = blY, trY, 1 do
-    moveToY(y)
+doXMovement()
 
-    if posZ == blZ then
-        for z = blZ, trZ, 1 do
-            moveToZ(z)
-            doXMovement()
-        end
-    else
-        for z = trZ, blZ, -1 do
-            moveToZ(z)
-            doXMovement()
-        end
-    end
-end
+-- function doZMovement(a, b)
+--     if a == b then return end
+
+--     local inc
+--     if b > a then
+--         inc = 1
+--     else
+--         inc = -1
+--     end
+
+--     for i = a, b, inc do
+--         moveToZ(i)
+--         doXMovement()
+--     end
+-- end
+
+-- doZMovement(blZ, trZ)
+
+-- for y = blY, trY, 1 do
+--     moveToY(y)
+
+--     if posZ == blZ then
+--         for z = blZ, trZ, 1 do
+--             moveToZ(z)
+--             doXMovement()
+--         end
+--     else
+--         for z = trZ, blZ, -1 do
+--             moveToZ(z)
+--             doXMovement()
+--         end
+--     end
+-- end
