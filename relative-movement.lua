@@ -97,8 +97,6 @@ end
 
 function moveToX(destX)
     local moves = destX - posX
-    print(posX)
-    print(destX)
     if moves == 0 then return end
 
     local posIncrement = 1
@@ -195,38 +193,45 @@ function doXMovement()
     end
 end
 
-doXMovement()
 
--- function doZMovement(a, b)
---     if a == b then return end
+function doZMovement(a, b)
+    local inc
+    if b > a then
+        inc = 1
+    else
+        inc = -1
+    end
 
---     local inc
---     if b > a then
---         inc = 1
---     else
---         inc = -1
---     end
+    for i = a, b, inc do
+        moveToZ(i)
+        doXMovement()
+    end
+end
 
---     for i = a, b, inc do
---         moveToZ(i)
---         doXMovement()
---     end
--- end
+function doYMovement(a, b)
+    local inc
+    if b > a then
+        inc = 1
+    else
+        inc = -1
+    end
 
--- doZMovement(blZ, trZ)
+    for i = a, b, inc do
+        moveToY(i)
+        if posZ == blZ then
+            doZMovement(blZ, trZ)
+        else
+            doZMovement(trZ, blZ)
+        end
+    end
 
--- for y = blY, trY, 1 do
---     moveToY(y)
+end
 
---     if posZ == blZ then
---         for z = blZ, trZ, 1 do
---             moveToZ(z)
---             doXMovement()
---         end
---     else
---         for z = trZ, blZ, -1 do
---             moveToZ(z)
---             doXMovement()
---         end
---     end
--- end
+doYMovement(blY, trY)
+
+-- return to origin
+moveToY(0)
+moveToX(0)
+moveToZ(0)
+-- reset to original bearing
+turn(NORTH)
