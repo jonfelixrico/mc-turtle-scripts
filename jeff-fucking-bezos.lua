@@ -169,17 +169,42 @@ function moveToY(destY)
     return true
 end
 
-function move(x, y, z)
-    moveToY(y)
-    moveToX(x)
-    moveToZ(z)
+-- Returns a function that accepts a value `x` and returns the value `y`.
+-- The function is actually an equation of a line which was obtained using the two-point form.
+function twoPointFactory(xA, yA, xB, yB)
+    local slopeY = yB - yA
+    local slopeX = xB - xA
+
+    return function (x)
+        return (slopeY / slopeX) * (x - xA) + yA
+    end
+end
+
+-- Moves the turtle on the horizontal plane. If the destination is not a straight line (with respect to z or x),
+-- then the turtle moves diagonally.
+function moveHorizontal(destX, destZ)
+    local startX = math.min(destX, posX)
+    local endX = math.max(destX, posX)
+
+    -- As you can see here, we're finally making use of the math we learned in high school
+    local lineFunction = twoPointFactory(posX, posZ, destX, destZ)
+
+    for x = startX, endX, 1 do
+        local z = lineFunction(x)
+        moveToX(x)
+        moveToZ(z)
+    end
 end
 
 local modem = peripheral.wrap("right")
 modem.open(recvChannel)
 
 while true do
+    -- os.pullEvent will "lock" the main process. The following code will not proceed until it receives a "modem_message"
+    -- event from the OS (no idea how that works under the hood)
     local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
+    
+    -- The payload (message) of the event is expected to be a JSON array containing 3 numbers, represeting X, Y, and Z coordinates
     local coords = textutils.unserializeJSON(message)
     
     local targetX = coords[1]
@@ -192,15 +217,13 @@ while true do
     local origB = bearing
     
     moveToY(targetY + 15)
-    moveToX(targetX)
-    moveToZ(targetZ)
+    moveHorizontal(targetX, targetZ)
 
     moveToY(targetY + 5)
     turtle.dropDown(1)
 
     moveToY(targetY + 15)
-    moveToX(origX)
-    moveToZ(origZ)
+    moveHorizontal(origX, origZ)
     moveToY(origY)
     turn(origB)
 end
