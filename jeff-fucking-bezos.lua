@@ -1,19 +1,19 @@
 -- # CONSTANTS
 
 -- These are bearings
-local NORTH = 1
-local EAST = 2
-local SOUTH = 3
-local WEST = 4
+NORTH = 1
+EAST = 2
+SOUTH = 3
+WEST = 4
 
 local args = {...}
 
 -- Positioning variables
-local posX = tonumber(args[1])
-local posY = tonumber(args[2])
-local posZ = tonumber(args[3])
-local bearing = tonumber(args[4])
-local recvChannel = tonumber(args[5])
+posX = tonumber(args[1])
+posY = tonumber(args[2])
+posZ = tonumber(args[3])
+bearing = tonumber(args[4])
+recvChannel = tonumber(args[5])
 
 function turn(dir)
     if bearing == NORTH then
@@ -180,17 +180,31 @@ function twoPointFactory(xA, yA, xB, yB)
     end
 end
 
+function ternary(condition, ifTrue, ifFalse)
+    if condition then
+        return ifTrue
+    else
+        return ifFalse
+    end
+end
+
 -- Moves the turtle on the horizontal plane. If the destination is not a straight line (with respect to z or x),
 -- then the turtle moves diagonally.
 function moveHorizontal(destX, destZ)
-    local startX = math.min(destX, posX)
-    local endX = math.max(destX, posX)
+    local startX = posX
+    local endX = destX
+
+    if startX == endX then
+        moveToZ(destZ)
+        return
+    end
 
     -- As you can see here, we're finally making use of the math we learned in high school
     local lineFunction = twoPointFactory(posX, posZ, destX, destZ)
 
-    for x = startX, endX, 1 do
+    for x = startX, endX, ternary(startX < endX, 1, -1) do
         local z = lineFunction(x)
+        print(string.format("Going to %d %d", x, z))
         moveToX(x)
         moveToZ(z)
     end
@@ -226,4 +240,5 @@ while true do
     moveHorizontal(origX, origZ)
     moveToY(origY)
     turn(origB)
+    print(string.format('Now at %d %d', posX, posZ))
 end
