@@ -113,6 +113,13 @@ function computeVerticalPath(from, to)
     return path
 end
 
+
+-- The values used by initTurnManager
+NORTH = 1
+EAST = 2
+SOUTH = 3
+WEST = 4
+
 function initTurnManager (initialBearing)
     local turnManager = {}
     turnManager.initialBearing = initialBearing
