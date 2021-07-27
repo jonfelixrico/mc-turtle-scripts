@@ -57,13 +57,14 @@ function computeHorizontalPath(from, to)
 	for x = from.x, to.x, ternary(to.x >= from.x, 1, -1) do
 		-- We're skipping the z-alternation in the first step of x because this will cause the turtle to start moving on the opposite side
         -- instead of its initial position
-        if x ~= fromX then
+        if x ~= from.x then
             -- z-swapping produces the snake-like behavior where the turtle starts from end-to-end
-			zStart = ternary(zStart == from.z, to.z, from.z)
-			zEnd = ternary(zEnd == from.z, to.z, from.z)
+			local oldZStart = zStart
+            zStart = zEnd
+			zEnd = oldZStart
 		end
 		
-		for z = zStart, ternary(zStart == from.z, to.z, from.z), ternary(zEnd >= zStart, 1, -1) do
+		for z = zStart, zEnd, ternary(zEnd >= zStart, 1, -1) do
 			local coords = {}
 
             coords.x = x
