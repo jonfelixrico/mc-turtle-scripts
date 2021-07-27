@@ -78,6 +78,8 @@ end
 local DIG_HEIGHT = 3
 
 -- Computes the path the turtle will take on the vertical plane
+-- @param from {number} The y value the turtle will begin at
+-- @param to {number} The y value the turtle will end up at
 function computeVerticalPath(from, to)
 	local path = initArray()
     local moveUp = to >= from
