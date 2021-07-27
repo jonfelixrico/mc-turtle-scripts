@@ -7,22 +7,30 @@ function ternary(condition, trueValue, falseValue)
 	end
 end
 
+function initArray ()
+    local array = {}
+    local indexCounter = 1
+    
+    function push(val)
+        local pushedIndex = indexCounter
+        indexCounter = indexCounter + 1 -- iterate the counter to the next
+
+        array[pushedIndex] = val
+        array["length"] = pushedIndex
+    end
+
+    array["push"] = push
+
+    return array
+end
+
 -- Computes the path the turtle will take on the horizontal plane
 -- `to` and `from` creates a 2d rectangle, and the path created will be something that "fills" this rectangle
 -- @param from {table} Should have z and x properties, both of which have numeric value. This is the starting point of the turtle.
 -- @param to {table} Same as above, but this is an ending point of the turtle
 -- @returns {array} An array of the horizontal movements that the turtle will be making
 function computeHorizontalPath(from, to)
-	local path = {}
-    local indexCounter = 1
-
-    function push(horizontalCoords)
-        local pushedIndex = indexCounter
-        indexCounter = indexCounter + 1 -- iterate the counter to the next
-
-        path[indexCounter] = horizontalCoords
-        path["length"] = pushedIndex
-    end
+	local path = initArray()
 
 	local zStart = from.z
 	local zEnd = to.z
@@ -43,7 +51,7 @@ function computeHorizontalPath(from, to)
             coords["x"] = x
             coords["z"] = z
 
-            push(coords) 
+            path["push"](coords) 
 		end
 	end
 
