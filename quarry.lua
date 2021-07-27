@@ -7,7 +7,7 @@ function ternary(condition, trueValue, falseValue)
 	end
 end
 
-function initArray ()
+function Array ()
     local array = {}
     local indexCounter = 1
     array.length = 0
@@ -47,7 +47,7 @@ end
 -- @param to {table} Same as above, but this is an ending point of the turtle
 -- @returns {array} An array of the horizontal movements that the turtle will be making
 function computeHorizontalPath(from, to)
-	local path = initArray()
+	local path = Array()
 
 	local zStart = from.z
 	local zEnd = to.z
@@ -81,7 +81,7 @@ local DIG_HEIGHT = 3
 -- @param from {number} The y value the turtle will begin at
 -- @param to {number} The y value the turtle will end up at
 function computeVerticalPath(from, to)
-	local path = initArray()
+	local path = Array()
     local moveUp = to >= from
 
 	local distance = math.abs(from - to) + 1 -- inclusive distance, hence + 1
