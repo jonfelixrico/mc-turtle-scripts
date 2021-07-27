@@ -32,11 +32,12 @@ function Array ()
     return array
 end
 
-function createCoords (x, z)
+function createCoords (x, y, z)
     local coords = {}
 
     coords.x = x
     coords.z = z
+    coords.y = y
 
     return coords
 end
