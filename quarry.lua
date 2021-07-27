@@ -291,6 +291,8 @@ function MovementManager (initialCoords, initialBearing)
     
         return true
     end
+
+    return manager
 end
 
 
