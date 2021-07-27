@@ -299,23 +299,16 @@ function MovementManager (initialCoords, initialBearing)
         return createCoords(manager.posX, manager.posY, manager.posZ)
     end
 
-    return manager
-end
-
--- Returns a function that accepts a value `x` and returns the value `y`.
--- The function is actually an equation of a line which was obtained using the two-point form.
-function twoPointFactory(xA, yA, xB, yB)
-    local slopeY = yB - yA
-    local slopeX = xB - xA
-
-    return function (x)
-        return (slopeY / slopeX) * (x - xA) + yA
+    function twoPointFactory(xA, yA, xB, yB)
+        local slopeY = yB - yA
+        local slopeX = xB - xA
+    
+        return function (x)
+            return (slopeY / slopeX) * (x - xA) + yA
+        end
     end
-end
 
-function smoothHorizontalMovementFactory (movementManager)
-    local manager = movementManager
-    return function (destX, destZ)
+    manager.moveDiagonally = function (destX, destZ)
         local startX = manager.posX
         local endX = destX
     
@@ -333,26 +326,27 @@ function smoothHorizontalMovementFactory (movementManager)
             manager.moveToZ(z)
         end
     end
+
+    return manager
 end
 
 function twoWayTripFactory(movementManager)
-    local xzMovementFn = smoothHorizontalMovementFactory(movementManager)
     local manager = movementManager
 
     return function (targetCoords) -- moves to the target coordinates
         local origCoords = manager.getCoords()
         manager.moveToY(targetCoords.y)
-        xzMovementFn(targetCoords.x, targetCoords.z)
+        manager.moveDiagonally(targetCoords.x, targetCoords.z)
 
         return function() -- returns back to the location the turtle was at before calling goto()
-            xzMovementFn(origCoords.x, origCoords.z)
+            manager.moveDiagonally(origCoords.x, origCoords.z)
             manager.moveToY(origCoords.y)
         end
     end
 end
 
-function inventoryEjectRoutineFactory(movementManager, inventoryCoords)
-    local tripFn = twoWayTripFactory(movementManager)
+function inventoryEjectRoutineFactory(twoWayTripFn, inventoryCoords)
+    local tripFn = twoWayTripFactory
     
     function unloadAll()
         for i = 1, 16, 1 do
@@ -389,7 +383,8 @@ function main(args)
     local engine = MovementManager(from, bearing)
     local vPath = computeVerticalPath(from.y, to.y)
 
-    local inventoryFn = inventoryEjectRoutineFactory(engine, createCoords(numArgs[8], numArgs[9], numArgs[10]))
+    local twoWayTripFn = twoWayTripFactory(engine)
+    local inventoryFn = inventoryEjectRoutineFactory(twoWayTripFn, createCoords(numArgs[8], numArgs[9], numArgs[10]))
 
     vPath.forEach(
         function(vSegment, index)
