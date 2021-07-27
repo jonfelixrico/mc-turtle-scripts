@@ -309,29 +309,30 @@ function main(args)
     local hPath = computeHorizontalPath(from, to)
     local vPath = computeVerticalPath(from.y, to.y)
 
-    function digAdjacent()
-        turtle.digUp()
-        turtle.digDown()
-    end
 
-    local y = from.y
+    vPath.forEach(
+        function(vSegment)
+            local singleDig = not vSegment.skipped
+            engine.moveToY(vSegment.y)
 
-    for i = 1, vPath.length, 1 do
-        local vSegment = vPath[i]
-        engine.moveToY(vSegment)
+            function digAdjacent()
+                if not singleDig then
+                    turtle.digUp()
+                    turtle.digDown()
+                end
+            end
 
-        -- TODO explain this shit
-        if y - vSegment ~= 0 then
+            hPath.forEach(
+                function (hSegment)
+                    digAdjacent()
+                    engine.moveToX(hSegment.x)
+                    engine.moveToZ(hSegment.z)
+                end
+            )
+
             digAdjacent()
         end
-
-        for j = 1, hPath.length, 1 do
-            local hSegment = hPath[j]
-            digAdjacent()
-            engine.moveToX(hSegment.x)
-            engine.moveToY(hSegment.y)
-        end
-    end
+    )
 end
 
 main(...)
