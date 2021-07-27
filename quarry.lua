@@ -32,6 +32,15 @@ function initArray ()
     return array
 end
 
+function createCoords (x, z)
+    local coords = {}
+
+    coords.x = x
+    coords.z = z
+
+    return coords
+end
+
 -- Computes the path the turtle will take on the horizontal plane
 -- `to` and `from` creates a 2d rectangle, and the path created will be something that "fills" this rectangle
 -- @param from {table} Should have z and x properties, both of which have numeric value. This is the starting point of the turtle.
