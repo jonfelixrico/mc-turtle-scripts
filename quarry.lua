@@ -114,7 +114,7 @@ function computeVerticalPath(from, to)
 end
 
 
-function initmanager (initCoords, initialBearing)
+function initMovementManager (initCoords, initialBearing)
     local NORTH = 1
     local EAST = 2
     local SOUTH = 3
