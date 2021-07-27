@@ -389,7 +389,7 @@ function main(args)
     local engine = MovementManager(from, bearing)
     local vPath = computeVerticalPath(from.y, to.y)
 
-    local inventoryFn = inventoryEjectRoutineFactory(manager, createCoords(numArgs[8], numArgs[9], numArgs[10]))
+    local inventoryFn = inventoryEjectRoutineFactory(engine, createCoords(numArgs[8], numArgs[9], numArgs[10]))
 
     vPath.forEach(
         function(vSegment, index)
