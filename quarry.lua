@@ -284,3 +284,48 @@ function MovementManager (initialCoords, initialBearing)
         return true
     end
 end
+
+
+local ARGS_COUNT = 7
+function main(args)
+    -- currently the args are number strings; this block parses them
+    local numArgs = Array()
+    for i = 0, ARGS_COUNT, 1 do
+        numArgs.push(tonumber(args[i]))
+    end
+
+    local from = createCoords(numArgs[1], numArgs[2], numArgs[3])
+    local bearing = numArgs[4]
+    local to = createCoords(numArgs[5], numArgs[6], numArgs[7])
+
+    local engine = MovementManager(from, bearing)
+
+    local hPath = computeHorizontalPath(from, to)
+    local vPath = computeVerticalPath(from.y, to.y)
+
+    function digAdjacent()
+        turtle.digUp()
+        turtle.digDown()
+    end
+
+    local y = from.y
+
+    for i = 1, vPath.length, 1 do
+        local vSegment = vPath[i]
+        engine.moveToY(vSegment)
+
+        -- TODO explain this shit
+        if y - vSegment ~= 0 then
+            digAdjacent()
+        end
+
+        for j = 1, hPath.length, 1 do
+            local hSegment = hPath[j]
+            digAdjacent()
+            engine.moveToX(hSegment.x)
+            engine.moveToY(hSegment.y)
+        end
+    end
+end
+
+main(...)
