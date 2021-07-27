@@ -132,7 +132,7 @@ function MovementManager (initialCoords, initialBearing)
     local manager = {}
 
     manager.bearing = initialBearing
-    manager.posX = initialCoords.X
+    manager.posX = initialCoords.x
     manager.posY = initialCoords.y
     manager.posZ = initialCoords.z
 
