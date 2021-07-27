@@ -78,6 +78,12 @@ end
 
 local DIG_HEIGHT = 3
 
+function VertSegment(y, skipped)
+    local segment = {}
+    segment.y = y
+    segment.skipped = skipped == true
+end
+
 -- Computes the path the turtle will take on the vertical plane
 -- @param from {number} The y value the turtle will begin at
 -- @param to {number} The y value the turtle will end up at
@@ -101,14 +107,14 @@ function computeVerticalPath(from, to)
                 y = y + ternary(moveUp, DIG_HEIGHT, -DIG_HEIGHT)
             end
 
-            path.push(y)
+            path.push(VertSegment(y, true))
         end
 
         y = from + fullSteps * ternary(moveUp, DIG_HEIGHT, -DIG_HEIGHT)
     end
 
     for partialY = y, to, ternary(moveUp, 1, -1) do
-        path.push(partialY)
+        path.push(VertSegment(partialY))
     end
 
     return path
