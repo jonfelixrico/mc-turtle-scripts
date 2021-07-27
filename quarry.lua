@@ -321,7 +321,7 @@ function MovementManager (initialCoords, initialBearing)
         local lineFunction = twoPointFactory(manager.posX, manager.posZ, destX, destZ)
     
         for x = startX, endX, ternary(startX < endX, 1, -1) do
-            local z = lineFunction(x)
+            local z = math.floor(lineFunction(x))
             manager.moveToX(x)
             manager.moveToZ(z)
         end
