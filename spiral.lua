@@ -1,42 +1,42 @@
 -- modified spiral code from https://www.geeksforgeeks.org/print-a-given-matrix-in-spiral-form/ by karthiksrinivasprasad
-function spiralPrint(width, length)
+function spiralPrint(length, width)
     local i
     local k = 0
     local l = 0
     --[[
         k - starting row index
-        width - ending row index
+        length - ending row index
         l - starting column index
-        length - ending column index
+        width - ending column index
         i - iterator 
     ]]--
  
-    while k < width and l < length do
+    while k < length and l < width do
         -- print the first row from the remaining rows
-        for i = l,  length - 1, 1 do
-            print(string.format("%d %d", k, i))
+        for i = l,  width - 1, 1 do
+            print(string.format("%d %d", i, k))
         end
 
         k = k + 1
  
         -- print the last column from the remaining columns
-        for i = k, width - 1, 1 do
-            print(string.format("%d %d", i, length - 1))
+        for i = k, length - 1, 1 do
+            print(string.format("%d %d", width - 1, i))
         end
-        length = length - 1
+        width = width - 1
  
         -- print the last row from the remaining rows
-        if k < width then
-            for i = length - 1, l, -1 do
-                print(string.format("%d %d", width - 1, i))
+        if k < length then
+            for i = width - 1, l, -1 do
+                print(string.format("%d %d", i, length - 1))
             end
-            width = width - 1
+            length = length - 1
         end
  
         -- // print the first column from the remaining columns
-        if l < length then
-            for i = width - 1, k, -1 do
-                print(string.format("%d %d", i, l))
+        if l < width then
+            for i = length - 1, k, -1 do
+                print(string.format("%d %d", l, i))
             end
             l = l + 1
         end
