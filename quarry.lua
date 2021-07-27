@@ -137,7 +137,6 @@ function MovementManager (initialCoords, initialBearing)
     manager.posY = initialCoords.y
     manager.posZ = initialCoords.z
 
-    -- NOT EXPOSED
     function turn(dir)
         local bearing = manager.bearing
         if bearing == NORTH then
@@ -184,7 +183,9 @@ function MovementManager (initialCoords, initialBearing)
         manager.bearing = dir
     end
 
-    -- NOT EXPOSED
+    manager.turn = turn
+
+    -- not exposed directly as an anonymous function for ease of calling from other methods
     -- if movement was successful, returns true; false if otherwise
     function moveForward()
         -- no obstructions detected
@@ -292,6 +293,10 @@ function MovementManager (initialCoords, initialBearing)
         end
     
         return true
+    end
+
+    manager.getCoords = function()
+        return createCoords(manager.posX, manager.posY, manager.posZ)
     end
 
     return manager
