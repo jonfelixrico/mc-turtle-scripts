@@ -114,7 +114,7 @@ function computeVerticalPath(from, to)
 end
 
 
-function initMovementManager (initCoords, initialBearing)
+function MovementManager (initialCoords, initialBearing)
     local NORTH = 1
     local EAST = 2
     local SOUTH = 3
@@ -123,9 +123,9 @@ function initMovementManager (initCoords, initialBearing)
     local manager = {}
 
     manager.bearing = initialBearing
-    manager.posX = initCoords.X
-    manager.posY = initCoords.y
-    manager.posZ = initCoords.z
+    manager.posX = initialCoords.X
+    manager.posY = initialCoords.y
+    manager.posZ = initialCoords.z
 
     function turn(dir)
         if bearing == NORTH then
