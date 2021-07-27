@@ -114,20 +114,20 @@ function computeVerticalPath(from, to)
 end
 
 
-function initMovementManager (initCoords, initialBearing)
+function initmanager (initCoords, initialBearing)
     local NORTH = 1
     local EAST = 2
     local SOUTH = 3
     local WEST = 4
 
-    local movementManager = {}
+    local manager = {}
 
-    movementManager.bearing = initialBearing
-    movementManager.posX = initCoords.X
-    movementManager.posY = initCoords.y
-    movementManager.posZ = initCoords.z
+    manager.bearing = initialBearing
+    manager.posX = initCoords.X
+    manager.posY = initCoords.y
+    manager.posZ = initCoords.z
 
-    movementManager.turn = function(dir)
+    manager.turn = function(dir)
         if bearing == NORTH then
             -- facing NORTH
             if dir == EAST then
@@ -169,6 +169,116 @@ function initMovementManager (initCoords, initialBearing)
             end
         end
     
-        movementManager.bearing = dir
+        manager.bearing = dir
+    end
+
+    -- NOT EXPOSED
+    -- if movement was successful, returns true; false if otherwise
+    function moveForward()
+        -- no obstructions detected
+        if not turtle.detect() then
+            turtle.forward()
+            return true
+        end
+
+        -- obstruction detected
+
+        -- turtle failed digging for some reason
+        if not turtle.dig() then
+            return false
+        end
+
+        return turtle.forward()
+    end
+
+    manager.moveToX = function(destX)
+        local moves = destX - manager.posX
+        if moves == 0 then return end
+    
+        local posIncrement = 1
+    
+        if moves > 0 then
+            turn(EAST)
+        else
+            turn(WEST)
+            posIncrement = -1
+        end
+    
+        for i = 1, math.abs(moves), 1 do
+            if not moveForward() then
+                return false
+            end
+    
+            -- will add +1 to pos if moving right, -1 if moving left
+            manager.posX = manager.posX + posIncrement
+        end
+    
+        return true
+    end
+    
+    manager.moveToZ = function(destZ)
+        local moves = destZ - manager.posZ
+        if moves == 0 then return end
+    
+        local posIncrement = 1
+    
+        if moves > 0 then
+            -- in MC, south is positive Z
+            turn(SOUTH)
+        else
+            turn(NORTH)
+            posIncrement = -1
+        end
+    
+        for i = 1, math.abs(moves), 1 do
+            if not moveForward() then
+                return false
+            end
+    
+            -- will add +1 to pos if moving right, -1 if moving left
+            manager.posZ = manager.posZ + posIncrement
+        end
+    
+        return true
+    end
+    
+    manager.moveToY = function(destY)
+        local moves = destY - manager.posY
+        if moves == 0 then return end
+    
+        local posIncrement = 1
+        local moveUp = moves > 0
+    
+        if not moveUp then
+            posIncrement = -1
+        end
+    
+        for i = 1, math.abs(moves), 1 do
+            if moveUp then
+                if turtle.detectUp() then
+                    -- obstruction detected; going to clear
+                    if not turtle.digUp() then
+                        -- turtle wasnt able to dig up for some reason
+                        return false
+                    end
+                end
+    
+                turtle.up()
+            else
+                -- same logic with the one above
+                if turtle.detectDown() then
+                    if not turtle.digDown() then
+                        return false
+                    end
+                end
+    
+                turtle.down()
+            end
+    
+            -- will add +1 to pos if moving right, -1 if moving left
+            manager.posY = manager.posY + posIncrement
+        end
+    
+        return true
     end
 end
