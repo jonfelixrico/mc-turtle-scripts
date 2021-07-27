@@ -108,7 +108,57 @@ function computeVerticalPath(from, to)
         path.push(partialY)
     end
 
-    path.forEach(print)
+    return path
 end
 
-computeVerticalPath(-1, -5)
+function initTurnManager (initialBearing)
+    local turnManager = {}
+    turnManager.initialBearing = initialBearing
+
+    function turn(dir)
+        if bearing == NORTH then
+            -- facing NORTH
+            if dir == EAST then
+                turtle.turnRight()
+            elseif dir == WEST then
+                turtle.turnLeft()
+            elseif dir == SOUTH then
+                turtle.turnRight()
+                turtle.turnRight()
+            end
+        elseif bearing == SOUTH then
+            -- facing SOUTH
+            if dir == NORTH then
+                turtle.turnRight()
+                turtle.turnRight()
+            elseif dir == EAST then
+                turtle.turnLeft()
+            elseif dir == WEST then
+                turtle.turnRight()
+            end
+        elseif bearing == EAST then
+            -- facing EAST
+            if dir == WEST then
+                turtle.turnRight()
+                turtle.turnRight()
+            elseif dir == NORTH then
+                turtle.turnLeft()
+            elseif dir == SOUTH then
+                turtle.turnRight()
+            end
+        else -- facing WEST
+            if dir == EAST then
+                turtle.turnRight()
+                turtle.turnRight()
+            elseif dir == NORTH  then
+                turtle.turnRight()
+            elseif dir == SOUTH then
+                turtle.turnLeft()
+            end
+        end
+    
+        turnManager.bearing = dir
+    end
+
+    turnManager.turn = turn
+end
