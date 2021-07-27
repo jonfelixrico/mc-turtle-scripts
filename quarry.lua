@@ -114,17 +114,20 @@ function computeVerticalPath(from, to)
 end
 
 
--- The values used by initTurnManager
-NORTH = 1
-EAST = 2
-SOUTH = 3
-WEST = 4
+function initMovementManager (initCoords, initialBearing)
+    local NORTH = 1
+    local EAST = 2
+    local SOUTH = 3
+    local WEST = 4
 
-function initTurnManager (initialBearing)
-    local turnManager = {}
-    turnManager.initialBearing = initialBearing
+    local movementManager = {}
 
-    function turn(dir)
+    movementManager.bearing = initialBearing
+    movementManager.posX = initCoords.X
+    movementManager.posY = initCoords.y
+    movementManager.posZ = initCoords.z
+
+    movementManager.turn = function(dir)
         if bearing == NORTH then
             -- facing NORTH
             if dir == EAST then
@@ -166,8 +169,6 @@ function initTurnManager (initialBearing)
             end
         end
     
-        turnManager.bearing = dir
+        movementManager.bearing = dir
     end
-
-    turnManager.turn = turn
 end
