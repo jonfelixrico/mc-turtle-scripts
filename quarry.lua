@@ -36,6 +36,16 @@ function Array ()
         return newArr
     end
 
+    array.map = function(fn)
+        local newArr = Array()
+
+        for i = 1, array.length, 1 do
+            newArr.push(fn(array[i], i, array))
+        end
+
+        return newArr
+    end
+
     return array
 end
 
