@@ -302,8 +302,79 @@ function MovementManager (initialCoords, initialBearing)
     return manager
 end
 
+-- Returns a function that accepts a value `x` and returns the value `y`.
+-- The function is actually an equation of a line which was obtained using the two-point form.
+function twoPointFactory(xA, yA, xB, yB)
+    local slopeY = yB - yA
+    local slopeX = xB - xA
 
-local ARGS_COUNT = 7
+    return function (x)
+        return (slopeY / slopeX) * (x - xA) + yA
+    end
+end
+
+function smoothHorizontalMovementFactory (injectedMovementManager)
+    local manager = injectedMovementManager
+    return function (destX, destZ)
+        local startX = manager.posX
+        local endX = destX
+    
+        if startX == endX then
+            manager.moveToZ(destZ)
+            return
+        end
+    
+        -- As you can see here, we're finally making use of the math we learned in high school
+        local lineFunction = twoPointFactory(manager.posX, manager.posZ, destX, destZ)
+    
+        for x = startX, endX, ternary(startX < endX, 1, -1) do
+            local z = lineFunction(x)
+            manager.moveToX(x)
+            manager.moveToZ(z)
+        end
+    end
+end
+
+function twoWayTripFactory(injectedMovementManager)
+    local xzMovementFn = smoothHorizontalMovementFactory(injectedMovementManager)
+    local manager = injectedMovementManager
+
+    return function (targetCoords) -- moves to the target coordinates
+        local origCoords = manager.getCoords()
+        manager.moveToY(targetCoords.y)
+        xzMovementFn(targetCoords.x, targetCoords.z)
+
+        return function() -- returns back to the location the turtle was at before calling goto()
+            xzMovementFn(origCoords.x, origCoords.z)
+            manager.moveToY(origCoords.y)
+        end
+    end
+end
+
+function inventoryEjectRoutineFactory(injectedMovementManager, inventoryCoords)
+    local tripFn = twoWayTripFactory(injectedMovementManager)
+    
+    function unloadAll()
+        for i = 1, 16, 1 do
+            turtle.select(i)
+            turtle.dropDown()
+        end
+    end
+    
+    return function ()
+        local returnFn = tripFn(inventoryCoords)
+        unloadAll()
+        returnFn()
+    end
+end
+
+function succ()
+    turtle.suck()
+    turtle.suckUp()
+    turtle.suckDown()
+end
+
+local ARGS_COUNT = 10
 function main(args)
     -- currently the args are number strings; this block parses them
     local numArgs = Array()
@@ -318,6 +389,7 @@ function main(args)
     local engine = MovementManager(from, bearing)
     local vPath = computeVerticalPath(from.y, to.y)
 
+    local inventoryFn = inventoryEjectRoutineFactory(manager, createCoords(numArgs[8], numArgs[9], numArgs[10]))
 
     vPath.forEach(
         function(vSegment, index)
@@ -343,10 +415,12 @@ function main(args)
                     digAdjacent()
                     engine.moveToX(hSegment.x)
                     engine.moveToZ(hSegment.z)
+                    succ()
                 end
             )
 
             digAdjacent()
+            inventoryFn()
         end
     )
 end
