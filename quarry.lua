@@ -127,7 +127,7 @@ function initmanager (initCoords, initialBearing)
     manager.posY = initCoords.y
     manager.posZ = initCoords.z
 
-    manager.turn = function(dir)
+    function turn(dir)
         if bearing == NORTH then
             -- facing NORTH
             if dir == EAST then
