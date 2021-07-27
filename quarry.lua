@@ -12,7 +12,7 @@ function Array ()
     local indexCounter = 1
     array.length = 0
     
-    array.push function(val)
+    array.push = function(val)
         local pushedIndex = indexCounter
         indexCounter = indexCounter + 1 -- iterate the counter to the next
 
