@@ -413,7 +413,7 @@ function main(args)
 
             digAdjacent()
             -- don't go back into the hole if quarrying is finished
-            inventoryFn(index == vPath,.length)
+            inventoryFn(index ~= vPath.length)
         end
     )
 end
