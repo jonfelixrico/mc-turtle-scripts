@@ -330,10 +330,10 @@ function MovementManager (initialCoords, initialBearing)
     return manager
 end
 
-function twoWayTripFactory(movementManager)
+function inventoryEjectRoutineFactory(movementManager, inventoryCoords)
     local manager = movementManager
 
-    return function (targetCoords) -- moves to the target coordinates
+    function tripFn (targetCoords) -- moves to the target coordinates
         local origCoords = manager.getCoords()
         manager.moveToY(targetCoords.y)
         manager.moveDiagonally(targetCoords.x, targetCoords.z)
@@ -343,10 +343,6 @@ function twoWayTripFactory(movementManager)
             manager.moveToY(origCoords.y)
         end
     end
-end
-
-function inventoryEjectRoutineFactory(twoWayTripFn, inventoryCoords)
-    local tripFn = twoWayTripFactory
     
     function unloadAll()
         for i = 1, 16, 1 do
@@ -383,8 +379,7 @@ function main(args)
     local engine = MovementManager(from, bearing)
     local vPath = computeVerticalPath(from.y, to.y)
 
-    local twoWayTripFn = twoWayTripFactory(engine)
-    local inventoryFn = inventoryEjectRoutineFactory(twoWayTripFn, createCoords(numArgs[8], numArgs[9], numArgs[10]))
+    local inventoryFn = inventoryEjectRoutineFactory(engine, createCoords(numArgs[8], numArgs[9], numArgs[10]))
 
     vPath.forEach(
         function(vSegment, index)
