@@ -313,8 +313,8 @@ function twoPointFactory(xA, yA, xB, yB)
     end
 end
 
-function smoothHorizontalMovementFactory (injectedMovementManager)
-    local manager = injectedMovementManager
+function smoothHorizontalMovementFactory (movementManager)
+    local manager = movementManager
     return function (destX, destZ)
         local startX = manager.posX
         local endX = destX
@@ -335,9 +335,9 @@ function smoothHorizontalMovementFactory (injectedMovementManager)
     end
 end
 
-function twoWayTripFactory(injectedMovementManager)
-    local xzMovementFn = smoothHorizontalMovementFactory(injectedMovementManager)
-    local manager = injectedMovementManager
+function twoWayTripFactory(movementManager)
+    local xzMovementFn = smoothHorizontalMovementFactory(movementManager)
+    local manager = movementManager
 
     return function (targetCoords) -- moves to the target coordinates
         local origCoords = manager.getCoords()
@@ -351,8 +351,8 @@ function twoWayTripFactory(injectedMovementManager)
     end
 end
 
-function inventoryEjectRoutineFactory(injectedMovementManager, inventoryCoords)
-    local tripFn = twoWayTripFactory(injectedMovementManager)
+function inventoryEjectRoutineFactory(movementManager, inventoryCoords)
+    local tripFn = twoWayTripFactory(movementManager)
     
     function unloadAll()
         for i = 1, 16, 1 do
