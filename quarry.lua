@@ -127,6 +127,7 @@ function MovementManager (initialCoords, initialBearing)
     manager.posY = initialCoords.y
     manager.posZ = initialCoords.z
 
+    -- NOT EXPOSED
     function turn(dir)
         if bearing == NORTH then
             -- facing NORTH
