@@ -59,6 +59,77 @@ function createCoords (x, y, z)
     return coords
 end
 
+-- modified spiral code from https://www.geeksforgeeks.org/print-a-given-matrix-in-spiral-form/ by karthiksrinivasprasad
+function generateCartesianSpiral(length, width)
+    local i
+    local k = 0
+    local l = 0
+    local array = Array()
+
+    function pushCoords(x, z)
+        array.push(createCoords(x, nil, z))
+    end
+
+    --[[
+        k - starting row index
+        length - ending row index
+        l - starting column index
+        width - ending column index
+        i - iterator 
+    ]]--
+ 
+    while k < length and l < width do
+        -- print the first row from the remaining rows
+        for i = l,  width - 1, 1 do
+            pushCoords(i, k)
+        end
+
+        k = k + 1
+ 
+        -- print the last column from the remaining columns
+        for i = k, length - 1, 1 do
+            pushCoords(width - 1, i)
+        end
+        width = width - 1
+ 
+        -- print the last row from the remaining rows
+        if k < length then
+            for i = width - 1, l, -1 do
+                pushCoords(i, length - 1)
+            end
+            length = length - 1
+        end
+ 
+        -- // print the first column from the remaining columns
+        if l < width then
+            for i = length - 1, k, -1 do
+                pushCoords(l, i)
+            end
+            l = l + 1
+        end
+    end
+
+    return array
+end
+
+function computeSpiralPath(from, to)
+    local path = Array()
+
+    local length = math.abs(to.z - from.z) + 1
+    local width = math.abs(to.x - from.x) + 1
+
+    local spiralArr = generateCartesianSpiral(length, width)
+
+    local xMult = ternary(to.x >= from.x, 1, -1)
+    local zMult = ternary(to.z <= from.z, -1, 1)
+
+    return spiralArr.map(
+        function(val)
+            return createCoords(from.x + val.x * xMult, nil, from.z + val.z * zMult)
+        end
+    )
+end
+
 -- Computes the path the turtle will take on the horizontal plane
 -- `to` and `from` creates a 2d rectangle, and the path created will be something that "fills" this rectangle
 -- @param from {table} Should have z and x properties, both of which have numeric value. This is the starting point of the turtle.
@@ -394,6 +465,9 @@ function main(args)
 
     local inventoryFn = inventoryEjectRoutineFactory(engine, createCoords(numArgs[8], numArgs[9], numArgs[10]))
 
+    local hPath = computeSpiralPath(from, to)
+    local hPathRev = hPath.reverse()
+
     vPath.forEach(
         function(vSegment, index)
             local singleDig = not vSegment.skipped
@@ -407,11 +481,7 @@ function main(args)
             end
 
             local isOdd = index % 2 ~= 0
-            -- alternate between the corners so that the zigzag motion will be continouous
-            local hPath = computeHorizontalPath(
-                ternary(isOdd, from, to),
-                ternary(isOdd, to, from)
-            )
+            local hPath = ternary(index % 2 ~= 0, hPath, hPathRev)
 
             hPath.forEach(
                 function (hSegment)
