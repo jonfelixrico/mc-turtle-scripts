@@ -82,6 +82,8 @@ function VertSegment(y, skipped)
     local segment = {}
     segment.y = y
     segment.skipped = skipped == true
+
+    return segment
 end
 
 -- Computes the path the turtle will take on the vertical plane
@@ -296,7 +298,7 @@ local ARGS_COUNT = 7
 function main(args)
     -- currently the args are number strings; this block parses them
     local numArgs = Array()
-    for i = 0, ARGS_COUNT, 1 do
+    for i = 1, ARGS_COUNT, 1 do
         numArgs.push(tonumber(args[i]))
     end
 
@@ -335,4 +337,4 @@ function main(args)
     )
 end
 
-main(...)
+main({ ... })
