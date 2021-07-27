@@ -22,7 +22,7 @@ function Array ()
 
     function forEach(fn)
         for i = 1, array.length, 1 do
-            fn(array[i])
+            fn(array[i], i, array)
         end
     end
 
