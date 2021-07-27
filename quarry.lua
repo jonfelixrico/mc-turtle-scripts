@@ -12,7 +12,7 @@ function Array ()
     local indexCounter = 1
     array.length = 0
     
-    function push(val)
+    array.push function(val)
         local pushedIndex = indexCounter
         indexCounter = indexCounter + 1 -- iterate the counter to the next
 
@@ -20,14 +20,21 @@ function Array ()
         array.length = pushedIndex
     end
 
-    function forEach(fn)
+    array.forEach = function(fn)
         for i = 1, array.length, 1 do
             fn(array[i], i, array)
         end
     end
 
-    array.push = push
-    array.forEach = forEach
+    array.reverse = function()
+        local newArr = Array()
+
+        for i = array.length, 1, -1 do
+            newArr.push(array[i])
+        end
+
+        return newArr
+    end
 
     return array
 end
