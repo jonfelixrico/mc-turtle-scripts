@@ -351,17 +351,13 @@ function inventoryEjectRoutineFactory(movementManager, inventoryCoords)
         end
     end
     
-    return function ()
+    return function (shouldReturn)
         local returnFn = tripFn(inventoryCoords)
         unloadAll()
-        returnFn()
+        if shouldReturn == true then
+            returnFn()
+        end
     end
-end
-
-function succ()
-    turtle.suck()
-    turtle.suckUp()
-    turtle.suckDown()
 end
 
 local ARGS_COUNT = 10
@@ -405,12 +401,12 @@ function main(args)
                     digAdjacent()
                     engine.moveToX(hSegment.x)
                     engine.moveToZ(hSegment.z)
-                    succ()
                 end
             )
 
             digAdjacent()
-            inventoryFn()
+            -- don't go back into the hole if quarrying is finished
+            inventoryFn(index == vPath,.length)
         end
     )
 end
