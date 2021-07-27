@@ -311,13 +311,11 @@ function main(args)
     local to = createCoords(numArgs[5], numArgs[6], numArgs[7])
 
     local engine = MovementManager(from, bearing)
-
-    local hPath = computeHorizontalPath(from, to)
     local vPath = computeVerticalPath(from.y, to.y)
 
 
     vPath.forEach(
-        function(vSegment)
+        function(vSegment, index)
             local singleDig = not vSegment.skipped
             engine.moveToY(vSegment.y)
 
@@ -327,6 +325,13 @@ function main(args)
                     turtle.digDown()
                 end
             end
+
+            local isOdd = index % 2 ~= 0
+            -- alternate between the corners so that the zigzag motion will be continouous
+            local hPath = computeHorizontalPath(
+                ternary(isOdd, from, to),
+                ternary(isOdd, to, from)
+            )
 
             hPath.forEach(
                 function (hSegment)
