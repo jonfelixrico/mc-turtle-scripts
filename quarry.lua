@@ -10,16 +10,24 @@ end
 function initArray ()
     local array = {}
     local indexCounter = 1
+    array.length = 0
     
     function push(val)
         local pushedIndex = indexCounter
         indexCounter = indexCounter + 1 -- iterate the counter to the next
 
         array[pushedIndex] = val
-        array["length"] = pushedIndex
+        array.length = pushedIndex
     end
 
-    array["push"] = push
+    function forEach(fn)
+        for i = 1, array.length, 1 do
+            fn(array[i])
+        end
+    end
+
+    array.push = push
+    array.forEach = forEach
 
     return array
 end
@@ -42,16 +50,16 @@ function computeHorizontalPath(from, to)
         if x ~= fromX then
             -- z-swapping produces the snake-like behavior where the turtle starts from end-to-end
 			zStart = ternary(zStart == from.z, to.z, from.z)
-			zEnd = ternary(zEnd === from.z, to.z, from.z)
+			zEnd = ternary(zEnd == from.z, to.z, from.z)
 		end
 		
 		for z = zStart, ternary(zStart == from.z, to.z, from.z), ternary(zEnd >= zStart, 1, -1) do
 			local coords = {}
 
-            coords["x"] = x
-            coords["z"] = z
+            coords.x = x
+            coords.z = z
 
-            path["push"](coords) 
+            path.push(coords) 
 		end
 	end
 
