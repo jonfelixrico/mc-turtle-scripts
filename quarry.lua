@@ -66,22 +66,40 @@ function computeHorizontalPath(from, to)
 	return path
 end
 
--- Computes the path the turtle will take on the vertical plane
 local DIG_HEIGHT = 3
-function computeVerticalPath(from, to)
-	local path = {}
 
-	local distance = math.abs(from - to)
+-- Computes the path the turtle will take on the vertical plane
+function computeVerticalPath(from, to)
+	local path = initArray()
+    local moveUp = to >= from
+
+	local distance = math.abs(from - to) + 1 -- inclusive distance, hence + 1
     local steps = distance / DIG_HEIGHT
 
 	local fullSteps = math.floor(distance / DIG_HEIGHT)
-    local hasPartialSteps = steps - fullSteps > 0
+    local hasPartialSteps = math.abs(steps - fullSteps) > 0
 
     local y = from
-    local fullStepsTaken = 0
 
-    while y < to do
-        if fullSteps > 0 then
+    if fullSteps > 0 then
+        for i = 1, fullSteps, 1 do
+            if i == 1 then
+                y = y + ternary(moveUp, 1, -1)
+            else
+                y = y + ternary(moveUp, DIG_HEIGHT, -DIG_HEIGHT)
+            end
+
+            path.push(y)
         end
+
+        y = from + fullSteps * ternary(moveUp, DIG_HEIGHT, -DIG_HEIGHT)
     end
+
+    for partialY = y, to, ternary(moveUp, 1, -1) do
+        path.push(partialY)
+    end
+
+    path.forEach(print)
 end
+
+computeVerticalPath(-1, -5)
