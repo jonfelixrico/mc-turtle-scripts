@@ -14,10 +14,7 @@ function connectToWs(host, label, coords, bearing, fuel)
 
 
     print(string.format("Connecting to %s", host))
-    local ws, error = http.websocket(
-        string.format("ws://%s", host),
-        headers
-    )
+    local ws, error = http.websocket(host, headers)
 
     if ws == nil or ws == false then
         print("Failed to connect")
