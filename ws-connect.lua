@@ -24,15 +24,21 @@ function connectToWs(host)
     return ws
 end
 
+-- Movement utility
 function MovementManager (initialCoords, initialBearing)
     initialCoords = ternary(initialCoords ~= nil, initialCoords, {})
     
+    local manager = {}
+
     local NORTH = 1
     local EAST = 2
     local SOUTH = 3
     local WEST = 4
 
-    local manager = {}
+    manager.NORTH = NORTH
+    manager.EAST = EAST
+    manager.SOUTH = SOUTH
+    manager.WEST = WEST
 
     manager.bearing = ternary(initalBearing ~= nil, initialBearing, NORTH)
     manager.posX = ternary(initialCoords.x ~= nil, initialCoords.x, 0)
@@ -233,6 +239,59 @@ function MovementManager (initialCoords, initialBearing)
 
     return manager
 end
+
+function getPosition()
+    local x, y, z = gps.locate()
+    if x == nil then
+        return nil
+    end
+
+    local coords = {}
+    coords.x = x
+    coords.y = y
+    coords.z = z
+
+    return coords
+end
+
+function selfInitMovementManager()
+    print("Starting movement manager self-init.")
+
+    print("Retrieving location...")
+    local origCoords = getPosition()
+
+    if origCoords == nil then
+        print("Cannot obtain location.")
+        return false
+    end
+    print(string.format("Obtained location -- %d %d %d", x, y, z))
+
+    local manager = MovementManager(origCoords)
+    
+    print("Obtaining bearing... will move forward to check displacement.")
+    manager.moveForward()
+
+    local bearingCoords = getPosition()
+
+    local xDiff = origCoords.x - bearingCoords.x
+    local zDiff = origCoords.z - bearingCoords.z
+
+    if xDiff ~= 0 then
+        manager.bearing = ternary(xDiff > 0, manager.EAST, manager.WEST)
+    else
+        manager.bearing = ternary(zDiff > 0, manager.SOUTH, manager.NORTH)
+    end
+
+    print(string.format("Obtained bearing code %d", manager.bearing))
+
+    print("Bearing obtained. Returning to original position...")
+    turtle.back()
+
+    print("Self-init complete.")
+
+    return manager
+end
+
 function main (args)
     local ws = connectToWs(args[1])
     if ws == nil then
