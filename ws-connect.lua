@@ -307,6 +307,7 @@ function emitTurtleStatusRoutineFactory(manager, websocket, intervalInSeconds)
             message.type = "STATUS_UPDATE"
             message.payload = status
             websocket.send(textutils.serializeJSON(message))
+            print("Sent STATUS_UPDATE to the server.")
 
             os.sleep(intervalInSeconds)
         end
