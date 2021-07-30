@@ -1,40 +1,23 @@
-function connectToWs(host, label, coords, bearing, fuel)
-    local payload = {}
-    payload.x = coords.x
-    payload.y = coords.y
-    payload.z = coords.z
-    payload.label = label
-    payload.bearing = bearing
-    payload.fuelLevel = fuel
-
-    local serialized = textutils.serializeJSON(payload)
-
+function connectToWs(host)
     local headers = {}
-    headers['turtle-data'] = serialized
-
+    headers['turtle-id'] = os.getComputerID()
 
     print(string.format("Connecting to %s", host))
     local ws, error = http.websocket(host, headers)
 
     if ws == nil or ws == false then
-        print("Failed to connect")
-        print(error)
+        print(string.format("Failed to connect: %s", error))
         return nil
     end
 
-    print(string.format("Connection established with %s", host))
+    print("Connection established.")
     return ws
 end
 
 function main (args)
-    local coords = {}
-    coords.x = 0
-    coords.y = 0
-    coords.z = 0
-
-    local ws = connectToWs(args[1], os.getComputerLabel(), coords, 1, 1)
-
+    local ws = connectToWs(args[1])
     if ws == nil then
+        -- Terminates turtle routine
         return
     end
 
