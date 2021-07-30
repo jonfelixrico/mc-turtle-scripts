@@ -295,6 +295,30 @@ function selfInitMovementManager()
     return manager
 end
 
+function emitTurtleStatusRoutineFactory(manager, websocket, intervalInSeconds)
+    intervalInSeconds = ternary(intervalInSeconds ~= nil, intervalInSeconds, 7)
+    return function ()
+        while true do
+            local status = manager.getPosition()
+            status.fuelLevel = turtle.getFuelLevel()
+            status.fuelLimit = turtle.getFuelLimit()
+
+            local message = {}
+            message.type = "STATUS_UPDATE"
+            message.payload = status
+            websocket.send(textutils.serializeJSON(message))
+
+            os.sleep(intervalInSeconds)
+        end
+    end
+end
+
+function listenForWebsocketMessagesRoutineFactory(manager, websocket)
+    return function ()
+        -- TODO reduce ws messages here
+    end
+end
+
 function main (args)
     local ws = connectToWs(args[1])
     if ws == nil then
@@ -302,10 +326,15 @@ function main (args)
         return
     end
 
-    while true do
-        local message = ws.receive()
-        print(message)
+    local manager = selfInitMovementManager()
+    if manager == nil then
+        return
     end
+
+    parallel.waitForAll(
+        emitTurtleStatusRoutineFactory(manager, ws),
+        listenForWebsocketMessagesRoutineFactory(manager, ws)
+    )
 end
 
 
