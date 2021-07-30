@@ -205,8 +205,11 @@ function MovementManager (initialCoords, initialBearing)
         return true
     end
 
-    manager.getCoords = function()
-        return createCoords(manager.posX, manager.posY, manager.posZ)
+    manager.getPosition = function()
+        local position = createCoords(manager.posX, manager.posY, manager.posZ)
+        position.bearing = manager.bearing
+
+        return position
     end
 
     function twoPointFactory(xA, yA, xB, yB)
