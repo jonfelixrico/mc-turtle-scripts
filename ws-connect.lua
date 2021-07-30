@@ -315,8 +315,27 @@ function emitTurtleStatusRoutineFactory(manager, websocket, intervalInSeconds)
 end
 
 function listenForWebsocketMessagesRoutineFactory(manager, websocket)
+    local typeTable = {}
+    typeTable.moveToX = manager.moveToX
+    typeTable.moveToY = manager.moveToY
+    typeTable.moveToZ = manager.moveToZ
+
+    function doIteration ()
+        local message = websocket.receive()
+        if message == nil then
+            print("Something went wrong while waiting for a message...")
+            return
+        end
+
+        local parsed = textutils.unserializeJSON(message)
+        print(string.format("Received a message of type %s", parsed.type))
+        typeTable[parsed.type](table.unpack(parsed.args))
+    end
+
     return function ()
-        -- TODO reduce ws messages here
+        while true do
+            doIteration()
+        end
     end
 end
 
