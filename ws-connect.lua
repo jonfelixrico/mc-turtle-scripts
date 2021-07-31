@@ -7,13 +7,12 @@ function ternary(condition, trueValue, falseValue)
 	end
 end
 
-
 function connectToWs(host)
-    local headers = {}
-    headers['turtle-id'] = os.getComputerID()
+    local computerId = os.getComputerID()
+    local url = string.format("%s/?id=%s", host, computerId)
 
-    print(string.format("Connecting to %s", host))
-    local ws, error = http.websocket(host, headers)
+    print(string.format("Attemptign to establish WS connection with %s", url))
+    local ws, error = http.websocket(url)
 
     if ws == nil or ws == false then
         print(string.format("Failed to connect: %s", error))
@@ -206,7 +205,10 @@ function MovementManager (initialCoords, initialBearing)
     end
 
     manager.getPosition = function()
-        local position = createCoords(manager.posX, manager.posY, manager.posZ)
+        local position = {}
+        position.x = manager.posX
+        position.y = manager.posY
+        position.z = manager.posZ 
         position.bearing = manager.bearing
 
         return position
@@ -267,7 +269,7 @@ function selfInitMovementManager()
         print("Cannot obtain location.")
         return false
     end
-    print(string.format("Obtained location -- %d %d %d", x, y, z))
+    print(string.format("Obtained location -- %d %d %d", origCoords.x, origCoords.y, origCoords.z))
 
     local manager = MovementManager(origCoords)
     
@@ -302,6 +304,7 @@ function emitTurtleStatusRoutineFactory(manager, websocket, intervalInSeconds)
             local status = manager.getPosition()
             status.fuelLevel = turtle.getFuelLevel()
             status.fuelLimit = turtle.getFuelLimit()
+            status.label = os.getComputerLabel()
 
             local message = {}
             message.type = "STATUS_UPDATE"
@@ -352,8 +355,7 @@ function main (args)
     end
 
     parallel.waitForAll(
-        emitTurtleStatusRoutineFactory(manager, ws),
-        listenForWebsocketMessagesRoutineFactory(manager, ws)
+        emitTurtleStatusRoutineFactory(manager, ws)
     )
 end
 
