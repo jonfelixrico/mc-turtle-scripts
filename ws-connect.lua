@@ -279,12 +279,11 @@ function selfInitMovementManager()
     local bearingCoords = getPosition()
 
     local xDiff = origCoords.x - bearingCoords.x
-    local zDiff = origCoords.z - bearingCoords.z
 
     if xDiff ~= 0 then
-        manager.bearing = ternary(xDiff > 0, manager.EAST, manager.WEST)
+        manager.bearing = ternary(bearingCoords.x > origCoords.x, manager.EAST, manager.WEST)
     else
-        manager.bearing = ternary(zDiff > 0, manager.SOUTH, manager.NORTH)
+        manager.bearing = ternary(bearingCoords.z > origCoords.z, manager.SOUTH, manager.NORTH)
     end
 
     print(string.format("Obtained bearing code %d", manager.bearing))
