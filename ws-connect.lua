@@ -296,27 +296,22 @@ function selfInitMovementManager()
     return manager
 end
 
-function emitTurtleStatusRoutineFactory(manager, websocket, intervalInSeconds)
-    intervalInSeconds = ternary(intervalInSeconds ~= nil, intervalInSeconds, 7)
+function sendTurtleStatusFactory (manager, websocket)
     return function ()
-        while true do
-            local status = manager.getPosition()
-            status.fuelLevel = turtle.getFuelLevel()
-            status.fuelLimit = turtle.getFuelLimit()
-            status.label = os.getComputerLabel()
+        local status = manager.getPosition()
+        status.fuelLevel = turtle.getFuelLevel()
+        status.fuelLimit = turtle.getFuelLimit()
+        status.label = os.getComputerLabel()
 
-            local message = {}
-            message.type = "STATUS_UPDATE"
-            message.payload = status
-            websocket.send(textutils.serializeJSON(message))
-            print("Sent STATUS_UPDATE to the server.")
-
-            os.sleep(intervalInSeconds)
-        end
+        local message = {}
+        message.type = "STATUS_UPDATE"
+        message.payload = status
+        websocket.send(textutils.serializeJSON(message))
+        print("Sent STATUS_UPDATE to the server.")
     end
 end
 
-function listenForWebsocketMessagesRoutineFactory(manager, websocket)
+function listenForWebsocketMessagesRoutineFactory(manager, websocket, sendStatusFn)
     local ActionTable = {}
     ActionTable.MOVE_TO_X = manager.moveToX
     ActionTable.MOVE_TO_Y = manager.moveToY
@@ -343,6 +338,7 @@ function listenForWebsocketMessagesRoutineFactory(manager, websocket)
 
             if actionFn ~= nil then
                 actionFn(table.unpack(value.args))
+                sendStatusFn()
             else
                 print(string.format("Encountered unrecognized action %s", value.action))
             end
@@ -368,9 +364,12 @@ function main (args)
         return
     end
 
+    local sendStatusFn = sendTurtleStatusFactory(manager, ws)
+
+    sendStatusFn()
+
     parallel.waitForAll(
-        emitTurtleStatusRoutineFactory(manager, ws),
-        listenForWebsocketMessagesRoutineFactory(manager, ws)
+        listenForWebsocketMessagesRoutineFactory(manager, ws, sendStatusFn)
     )
 end
 
