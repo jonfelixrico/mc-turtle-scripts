@@ -318,10 +318,10 @@ function emitTurtleStatusRoutineFactory(manager, websocket, intervalInSeconds)
 end
 
 function listenForWebsocketMessagesRoutineFactory(manager, websocket)
-    local typeTable = {}
-    typeTable.moveToX = manager.moveToX
-    typeTable.moveToY = manager.moveToY
-    typeTable.moveToZ = manager.moveToZ
+    local ActionTable = {}
+    ActionTable.MOVE_TO_X = manager.moveToX
+    ActionTable.MOVE_TO_Y = manager.moveToY
+    ActionTable.MOVE_TO_Z = manager.moveToZ
 
     function doIteration ()
         local message = websocket.receive()
@@ -329,10 +329,25 @@ function listenForWebsocketMessagesRoutineFactory(manager, websocket)
             print("Something went wrong while waiting for a message...")
             return
         end
-
         local parsed = textutils.unserializeJSON(message)
-        print(string.format("Received a message of type %s", parsed.type))
-        typeTable[parsed.type](table.unpack(parsed.args))
+
+        if parsed.type ~= 'COMMAND' then
+            print("Ignoring non-COMMAND message.")
+            return
+        end
+
+        local actions = parsed.payload
+        print(string.format("Received a command with %d actions", table.maxn(actions)))
+
+        for index, value in ipairs(actions) do
+            local actionFn = ActionTable[value.action]
+
+            if actionFn ~= nil then
+                actionFn(table.unpack(value.args))
+            else
+                print(string.format("Encountered unrecognized action %s", value.action))
+            end
+        end
     end
 
     return function ()
@@ -355,7 +370,8 @@ function main (args)
     end
 
     parallel.waitForAll(
-        emitTurtleStatusRoutineFactory(manager, ws)
+        emitTurtleStatusRoutineFactory(manager, ws),
+        listenForWebsocketMessagesRoutineFactory(manager, ws)
     )
 end
 
